@@ -1,18 +1,71 @@
+import hmac
 import json
 import os
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+from functools import wraps
 
 import requests
-from flask import Flask, jsonify, render_template, request, session
-
-from auth import install_auth, require_auth
+from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 
 app = Flask(__name__, template_folder="../templates", static_folder="../static")
-install_auth(app)
 
 REQUESTS_KEY = "tag_requests:list"
 VALID_STATUSES = {"New Request", "In Progress", "Installed", "Canceled"}
+
+
+# ---------- Auth (merged from former auth.py to avoid Vercel sibling-module import issues) ----------
+
+app.config["SECRET_KEY"] = (
+    os.environ.get("FLASK_SECRET_KEY")
+    or "ft-design-system-dev-only-do-not-use-in-prod"
+)
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SECURE"] = bool(os.environ.get("VERCEL_ENV"))
+app.permanent_session_lifetime = timedelta(days=30)
+
+_APP_PASSWORD = os.environ.get("APP_PASSWORD") or "change-me-in-prod"
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    error = None
+    if request.method == "POST":
+        submitted = request.form.get("password") or ""
+        if hmac.compare_digest(submitted, _APP_PASSWORD):
+            session.permanent = True
+            session["authed"] = True
+            target = (
+                request.args.get("next")
+                or request.form.get("next")
+                or url_for("index")
+            )
+            if not target.startswith("/") or target.startswith("//"):
+                target = url_for("index")
+            return redirect(target)
+        error = "Incorrect password. Try again."
+    if session.get("authed"):
+        return redirect(url_for("index"))
+    return render_template("login.html", error=error, next=request.args.get("next", ""))
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+
+def require_auth(view):
+    @wraps(view)
+    def wrapper(*args, **kwargs):
+        if not session.get("authed"):
+            if request.path.startswith("/api/"):
+                return jsonify({"ok": False, "error": "Not authenticated"}), 401
+            return redirect(url_for("login", next=request.path))
+        return view(*args, **kwargs)
+
+    return wrapper
 
 
 # ---------- KV storage (Vercel KV / Upstash REST API) ----------

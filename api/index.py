@@ -8,7 +8,7 @@ from flask import Flask, jsonify, render_template, request, session
 
 from auth import install_auth, require_auth
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../templates", static_folder="../static")
 install_auth(app)
 
 REQUESTS_KEY = "tag_requests:list"

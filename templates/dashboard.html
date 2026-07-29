@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}fullthrottle.ai · Tag Request Dashboard{% endblock %}
+
+{% block header %}
+<header class="site-header">
+  <a href="https://nexstar.fullthrottle.app/" target="_blank" rel="noopener" class="header-link">Nexstar Platform →</a>
+  <a href="{{ url_for('index') }}" class="header-link">Tag Request Form</a>
+</header>
+{% endblock %}
+
+{% block content %}
+<section class="view">
+  <div class="hero hero--compact">
+    <p class="tagline">Nexstar Tag Requests</p>
+    <h1 class="login-heading">Partner Tag Request Dashboard</h1>
+    <p class="hero-blurb">All requests submitted by partners land here automatically. Update status as they move through install.</p>
+  </div>
+
+  <div class="calc-card">
+    <div class="status-summary" id="statusSummary">
+      <div class="status-count" data-filter="all">
+        <div class="status-count-value" id="countAll">0</div>
+        <div class="status-count-label">All Requests</div>
+      </div>
+      <div class="status-count" data-filter="New Request">
+        <div class="status-count-value" id="countNew">0</div>
+        <div class="status-count-label">New Request</div>
+      </div>
+      <div class="status-count" data-filter="In Progress">
+        <div class="status-count-value" id="countProgress">0</div>
+        <div class="status-count-label">In Progress</div>
+      </div>
+      <div class="status-count" data-filter="Installed">
+        <div class="status-count-value" id="countInstalled">0</div>
+        <div class="status-count-label">Installed</div>
+      </div>
+      <div class="status-count" data-filter="Canceled">
+        <div class="status-count-value" id="countCanceled">0</div>
+        <div class="status-count-label">Canceled</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="calc-card">
+    <div class="dashboard-toolbar">
+      <p class="refresh-note" id="filterLabel">Showing all requests</p>
+      <div class="toolbar-actions">
+        <button type="button" class="ghost-btn" id="downloadBtn">Download CSV</button>
+      </div>
+    </div>
+
+    <div class="request-table-wrap">
+      <table class="request-table">
+        <thead>
+          <tr>
+            <th scope="col">Client</th>
+            <th scope="col">Site URL</th>
+            <th scope="col">Status</th>
+            <th scope="col">Submitted By</th>
+            <th scope="col">Submitted</th>
+            <th scope="col">Installed Date</th>
+          </tr>
+        </thead>
+        <tbody id="requestTableBody">
+        </tbody>
+      </table>
+      <p class="empty-state" id="emptyState" style="display:none;">No tag requests yet. Share the partner submission link to get started.</p>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='dashboard.js') }}?v=1"></script>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}fullthrottle.ai · Submit a Tag Request{% endblock %}
+
+{% block header %}
+<header class="site-header">
+  {% if session.get('authed') %}
+    <a href="{{ url_for('logout') }}" class="header-link header-link--signout" title="End session">Sign out</a>
+  {% endif %}
+  <a href="https://nexstar.fullthrottle.app/" target="_blank" rel="noopener" class="header-link">Nexstar Platform →</a>
+</header>
+{% endblock %}
+
+{% block content %}
+<section class="view view--center view--narrow">
+  <div class="hero">
+    <div class="hero-logo">
+      {% include "_logo.svg" %}
+    </div>
+    <p class="tagline">Nexstar Tag Requests</p>
+    <h1 class="login-heading">Submit a New Tag Request</h1>
+  </div>
+
+  <p class="footnote" style="text-align:center;">
+    <a href="{{ url_for('login') }}" class="dashboard-link" style="color: var(--teal-bright); text-decoration: none; font-size: 15px; font-weight: 600;">Sign in to the tag request dashboard</a>
+  </p>
+
+  <div class="calc-card" id="formCard">
+    <form id="requestForm" novalidate>
+      <div class="controls">
+        <div class="control">
+          <label class="control-label" for="clientName">Client / Advertiser Name</label>
+          <div class="input-wrap">
+            <input class="input" id="clientName" name="clientName" type="text" placeholder="e.g. Riverside Auto Group" required />
+          </div>
+        </div>
+        <div class="control">
+          <label class="control-label" for="siteUrl">Client Website URL</label>
+          <div class="input-wrap">
+            <input class="input" id="siteUrl" name="siteUrl" type="text" placeholder="e.g. https://riversideauto.com" required />
+          </div>
+        </div>
+        <div class="control">
+          <label class="control-label" for="address">Address</label>
+          <div class="input-wrap">
+            <input class="input" id="address" name="address" type="text" placeholder="e.g. 123 Main St, Sioux Falls, SD" required />
+          </div>
+        </div>
+        <div class="control">
+          <label class="control-label" for="marketInput">Market</label>
+          <div class="combobox" id="marketCombobox">
+            <div class="input-wrap combobox-input-wrap">
+              <input class="input" id="marketInput" type="text" placeholder="Type to search market…" autocomplete="off" required />
+              <svg class="select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <input type="hidden" id="market" name="market" />
+            <ul class="combobox-list" id="marketList" role="listbox" hidden></ul>
+          </div>
+        </div>
+        <div class="control">
+          <label class="control-label" for="contactName">Your Name</label>
+          <div class="input-wrap">
+            <input class="input" id="contactName" name="contactName" type="text" placeholder="Contact name" required />
+          </div>
+        </div>
+        <div class="control">
+          <label class="control-label" for="contactEmail">Your Email</label>
+          <div class="input-wrap">
+            <input class="input" id="contactEmail" name="contactEmail" type="email" placeholder="you@nexstar.com" required />
+          </div>
+        </div>
+      </div>
+
+      <p class="form-error" id="formError" role="alert"></p>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        Submit Tag Request
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+      </button>
+    </form>
+
+    <div class="success-panel" id="successPanel" style="display:none;">
+      <div class="success-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </div>
+      <h2 class="login-heading" style="font-size: 20px;">Request Submitted</h2>
+      <p class="hero-blurb">The fullthrottle.ai team has been notified and will follow up if anything else is needed.</p>
+      <button type="button" class="ghost-btn" id="submitAnotherBtn">Submit another request</button>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='intake.js') }}?v=2"></script>
+{% endblock %}

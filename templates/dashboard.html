@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}fullthrottle.ai · Tag Request Dashboard{% endblock %}
+
+{% block header %}
+<header class="site-header">
+  <a href="https://nexstar.fullthrottle.app/" target="_blank" rel="noopener" class="header-link">Nexstar Platform →</a>
+  <a href="{{ url_for('index') }}" class="header-link">Tag Request Form</a>
+</header>
+{% endblock %}
+
+{% block content %}
+<section class="view view--wide">
+  <div class="hero hero--compact">
+    <p class="tagline">Nexstar Tag Requests</p>
+    <h1 class="login-heading">Partner Tag Request Dashboard</h1>
+    <p class="hero-blurb">All requests submitted by partners land here automatically. fullthrottle.ai team updates the status as the client moves through tag install process.</p>
+  </div>
+
+  <div class="calc-card">
+    <div class="status-summary" id="statusSummary">
+      <div class="status-count" data-filter="all">
+        <div class="status-count-value" id="countAll">0</div>
+        <div class="status-count-label">All Requests</div>
+      </div>
+      <div class="status-count" data-filter="New Request">
+        <div class="status-count-value" id="countNew">0</div>
+        <div class="status-count-label">New Request</div>
+      </div>
+      <div class="status-count" data-filter="In Progress">
+        <div class="status-count-value" id="countProgress">0</div>
+        <div class="status-count-label">In Progress</div>
+      </div>
+      <div class="status-count" data-filter="Pending Install">
+        <div class="status-count-value" id="countPending">0</div>
+        <div class="status-count-label">Pending Install</div>
+      </div>
+      <div class="status-count" data-filter="Installed">
+        <div class="status-count-value" id="countInstalled">0</div>
+        <div class="status-count-label">Installed</div>
+      </div>
+      <div class="status-count" data-filter="Canceled">
+        <div class="status-count-value" id="countCanceled">0</div>
+        <div class="status-count-label">Canceled</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="calc-card">
+    <div class="search-bar-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search by client name or URL…" autocomplete="off" spellcheck="false" />
+    </div>
+
+    <div class="dashboard-toolbar">
+      <p class="refresh-note" id="filterLabel">Showing all requests</p>
+      <div class="toolbar-actions">
+        <div class="market-filter" id="marketFilter">
+          <button type="button" class="ghost-btn" id="marketFilterBtn">Filter by Nexstar Market<span id="marketFilterCount"></span></button>
+          <div class="market-filter-panel" id="marketFilterPanel" hidden>
+            <div class="market-filter-actions">
+              <button type="button" id="marketFilterSelectAll">Select all</button>
+              <button type="button" id="marketFilterClear">Clear</button>
+            </div>
+            <div class="market-filter-list" id="marketFilterList"></div>
+          </div>
+        </div>
+        <div class="market-filter" id="rdFilter">
+          <button type="button" class="ghost-btn" id="rdFilterBtn">Filter by RD<span id="rdFilterCount"></span></button>
+          <div class="market-filter-panel" id="rdFilterPanel" hidden>
+            <div class="market-filter-actions">
+              <button type="button" id="rdFilterSelectAll">Select all</button>
+              <button type="button" id="rdFilterClear">Clear</button>
+            </div>
+            <div class="market-filter-list" id="rdFilterList"></div>
+          </div>
+        </div>
+        <div class="market-filter" id="assigneeFilter">
+          <button type="button" class="ghost-btn" id="assigneeFilterBtn">Filter by Assignee<span id="assigneeFilterCount"></span></button>
+          <div class="market-filter-panel" id="assigneeFilterPanel" hidden>
+            <div class="market-filter-actions">
+              <button type="button" id="assigneeFilterSelectAll">Select all</button>
+              <button type="button" id="assigneeFilterClear">Clear</button>
+            </div>
+            <div class="market-filter-list" id="assigneeFilterList"></div>
+          </div>
+        </div>
+        <button type="button" class="ghost-btn" id="downloadBtn">Download CSV</button>
+        <button type="button" class="ghost-btn" id="bulkUploadBtn">Bulk Upload</button>
+      </div>
+    </div>
+
+    <div class="request-table-wrap">
+      <table class="request-table">
+        <thead>
+          <tr>
+            <th scope="col">
+              <button type="button" class="sort-btn" data-sort="clientName">Client
+                <svg class="sort-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </th>
+            <th scope="col">
+              <button type="button" class="sort-btn" data-sort="script">Script
+                <svg class="sort-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </th>
+            <th scope="col">
+              <button type="button" class="sort-btn" data-sort="siteUrl">Site URL
+                <svg class="sort-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </th>
+            <th scope="col">
+              <button type="button" class="sort-btn" data-sort="status">Status
+                <svg class="sort-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </th>
+            <th scope="col">
+              <button type="button" class="sort-btn" data-sort="assignee">Assignee
+                <svg class="sort-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </th>
+            <th scope="col">
+              <button type="button" class="sort-btn" data-sort="address">Client Address
+                <svg class="sort-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </th>
+            <th scope="col">
+              <button type="button" class="sort-btn" data-sort="clientContactName">Client Contact Name
+                <svg class="sort-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </th>
+            <th scope="col">
+              <button type="button" class="sort-btn" data-sort="clientContactEmail">Client Contact Email
+                <svg class="sort-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </th>
+            <th scope="col">
+              <button type="button" class="sort-btn" data-sort="market">Nexstar Market
+                <svg class="sort-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </th>
+            <th scope="col">
+              <button type="button" class="sort-btn" data-sort="rd">RD
+                <svg class="sort-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </th>
+            <th scope="col">
+              <button type="button" class="sort-btn" data-sort="contactName">Nexstar AE Name
+                <svg class="sort-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </th>
+            <th scope="col">
+              <button type="button" class="sort-btn" data-sort="contactEmail">Nexstar AE Email
+                <svg class="sort-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </th>
+            <th scope="col">
+              <button type="button" class="sort-btn" data-sort="created_at">Submitted Date
+                <svg class="sort-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </th>
+            <th scope="col">
+              <button type="button" class="sort-btn" data-sort="installed_at">Installed Date
+                <svg class="sort-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </th>
+            <th scope="col">
+              <button type="button" class="sort-btn" data-sort="daysPending">Days Pending
+                <svg class="sort-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody id="requestTableBody">
+        </tbody>
+      </table>
+      <p class="empty-state" id="emptyState" style="display:none;">No tag requests yet. Share the partner submission link to get started.</p>
+    </div>
+  </div>
+</section>
+
+<div class="modal-overlay" id="bulkModalOverlay" hidden>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>Bulk Upload Clients</h2>
+      <button type="button" class="modal-close" id="bulkModalClose" aria-label="Close">&times;</button>
+    </div>
+
+    <div class="modal-body" id="bulkPasswordStep">
+      <p class="modal-text">This action is restricted. Enter the password to continue.</p>
+      <div class="input-wrap">
+        <input type="password" id="bulkPasswordInput" class="input" placeholder="Password" autocomplete="off" />
+      </div>
+      <p class="form-error" id="bulkPasswordError"></p>
+      <button type="button" class="submit-btn" id="bulkPasswordSubmit">Unlock</button>
+    </div>
+
+    <div class="modal-body" id="bulkUploadStep" hidden>
+      <p class="modal-text">Upload a CSV with these columns: <strong>Client Name, Site URL, Client Address, Client Contact Name, Client Contact Email, Nexstar Market, Nexstar AE Name, Nexstar AE Email</strong>.</p>
+      <button type="button" class="ghost-btn" id="bulkDownloadTemplate">Download CSV template</button>
+      <div class="input-wrap" style="margin-top: 4px;">
+        <input type="file" id="bulkFileInput" accept=".csv" />
+      </div>
+      <p class="form-error" id="bulkUploadError"></p>
+      <p class="bulk-summary" id="bulkUploadSummary"></p>
+      <button type="button" class="submit-btn" id="bulkUploadSubmit">Upload</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='dashboard.js') }}?v=2"></script>
+{% endblock %}
